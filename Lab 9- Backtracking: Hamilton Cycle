@@ -1,57 +1,59 @@
-source = int(input("Enter Source Vertex: "))
-num_vertices = int(input("Enter Number of vertices: "))
-num_edges = int(input("Enter Number of edges: "))
+class Graph():
+    def __init__(self, vertices):
+        self.graph = [[0 for column in range(vertices)] for row in range(vertices)]
+        self.V = vertices
 
-# Adjacency Matrix
-adjacency_matrix = [[0 for _ in range(num_vertices)]
-                    for __ in range(num_vertices)]
+    def isSafe(self, v, pos, path):
+        if self.graph[path[pos-1]][v] == 0:
+            return False
+        for vertex in path:
+            if vertex == v:
+                return False
+        return True
 
-# Global Result array
-result = []
+    def hamCycleUtil(self, path, pos):
+        if pos == self.V:
+            if self.graph[ path[pos-1] ][ path[0] ] == 1:
+                return True
+            else:
+                return False 
+        for v in range(1,self.V):
+            if self.isSafe(v, pos, path) == True:
+                path[pos] = v
+                if self.hamCycleUtil(path, pos+1) == True:
+                    return True
+                path[pos] = -1
+        return False
 
-# Function to pring the matrix
+    def hamCycle(self):
+        path = [-1] * self.V
+        path[0] = 0
 
+        if self.hamCycleUtil(path,1) == False:
+            print ("Solution does not exist\n")
+            return False
 
-def print_adjacency_matrix():
-    for row in adjacency_matrix:
-        print(row)
+        self.printSolution(path)
+        return True
 
-# Function to find Hamiltonion Cycles
+    def printSolution(self, path):
+        print ("Solution Exists: Following is one Hamiltonian Cycle")
+        for vertex in path:
+            print (vertex, end = " ")
+        print (path[0], "\n")
 
+g1 = Graph(5)
+g1.graph = [[0, 1, 0, 1, 0], 
+            [1, 0, 1, 1, 1],
+            [0, 1, 0, 0, 1],
+            [1, 1, 0, 0, 1],
+            [0, 1, 1, 1, 0]]
 
-def hamiltonion_cycle(matrix, source, vertices, visited, path=[]):
-    path.append(source)
+g1.hamCycle()
 
-    if vertices == 1:
-        s = path[0]
-        if matrix[source][s]:
-            result.append(path+[s])
-        path.pop()
-        return
+g2 = Graph(5)
+g2.graph = [ [0, 1, 0, 1, 0], [1, 0, 1, 1, 1],
+        [0, 1, 0, 0, 1,], [1, 1, 0, 0, 0],
+        [0, 1, 1, 0, 0], ]
 
-    for nxt in range(num_vertices):
-        if not visited[nxt] and matrix[source][nxt]:
-            visited[nxt] = True
-            hamiltonion_cycle(matrix, nxt, vertices-1, visited, path)
-            visited[nxt] = False
-    path.pop()
-
-
-if __name__ == "__main__":
-    # Function to take input
-    for i in range(num_edges):
-        s, d = (int(x)
-                for x in input("Enter source, destination (s d): ").split(" "))
-        adjacency_matrix[s][d] = 1
-        adjacency_matrix[d][s] = 1
-    print("The Graph is ")
-    print_adjacency_matrix()
-
-    visited = [False for _ in range(num_vertices)]
-    visited[source] = True
-
-    hamiltonion_cycle(adjacency_matrix, source, num_vertices, visited)
-
-    print("The Hamiltonian Cycles are: ")
-    for path in result:
-        print(path)
+g2.hamCycle()
